@@ -64,11 +64,11 @@ app.get("/", function(req, res){
 		// Login page requests
 app.route("/login")
 
-.get("/login", function(req, res){
+.get(function(req, res){
 	res.render("login");
 })
 
-.post("/login", function(req, res){
+.post(function(req, res){
 	const username = req.body.username;
 	const password = md5(req.body.password);
 
@@ -110,7 +110,7 @@ app.route("/register")
 		// List page requests
 app.route("/list")
 
-.get("/list", function(req, res){
+.get(function(req, res){
 
 	Item.find(function(err, foundItems){
 		if(foundItems.length === 0){
@@ -126,7 +126,7 @@ app.route("/list")
 		})
 })
 
-.post("/list", function(req, res){
+.post(function(req, res){
 
 	const itemName = req.body.newItem;
 	
