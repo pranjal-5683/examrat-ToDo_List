@@ -1,0 +1,42 @@
+<%- include('header'); -%>
+
+<style>
+body {
+  background-color: #E4E9FD;
+  background-image: -webkit-linear-gradient(68deg, #A683E3 50%, #E4E9FD 50%);
+  min-height: 820px;
+  font-family: 'helvetica neue';
+}
+</style>
+	
+
+		<div class="welcome-box">
+			<span id='welcome'>welcome&nbsp;</span>
+			<span id='name'><%= userName %></span>
+		</div>
+
+		<div class="box" id="heading">
+			<h1><%= listTitle %></h1>
+		</div>
+
+		<div class="box" id="">
+			<%	newListItems.forEach(function(item){ %>
+				<form action="/delete" method="post">
+					<div class="item">
+						<input type="checkbox" name="checkbox" value="<%= item._id %>" onChange="this.form.submit()">
+						<p> <%= item.name %></p>
+					</div>
+					<input type="hidden" name="listName" value="<%= listTitle %>"> </input>
+				</form>
+			<%	}) %>
+			<form class="item" action="/list" method="post">
+				<input type="text" name="newItem" placeholder="New Item" autocomplete="off">
+				<button type="submit" name="list" value="<%= listTitle%>">+</button>
+			</form>
+		</div>
+
+		<div class="box" id="logout">
+			<a href="/logout" class="btn btn-lg btn-danger logout-button" role-"button">Logout</a>
+		</div>
+
+<%- include('footer'); -%>

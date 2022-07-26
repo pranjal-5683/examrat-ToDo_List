@@ -1,0 +1,30 @@
+<%- include('header') %>
+<style>
+body {
+  background-image: -webkit-linear-gradient(65deg, #A683E3 50%, #E4E9FD 50%);
+  min-height: 567px;
+}
+</style>
+
+<div class="container-fluid centered">
+  <h1 id="form-heading">Login</h1>
+<br>
+  <div class="form">
+
+          <!-- Makes POST request to /login route -->
+          <form action="/login" method="POST">
+            <div class="form-group">
+              <input type="email" class="form-control" name="username" placeholder="Enter E-mail - e.g., abc@xyz.com" autocomplete="off">
+            </div><br>
+            <div class="form-group">
+              <input type="password" class="form-control" name="password" placeholder="Enter Password">
+            </div><br>
+            <button type="submit" class="btn btn-lg btn-dark form-button">Login</button>
+          </form>
+
+ 
+
+  </div>
+</div>
+
+<%- include('footer') %>

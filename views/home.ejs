@@ -1,0 +1,27 @@
+<%- include('header') %>
+<style>
+body {
+  background-image: -webkit-linear-gradient(65deg, #A683E3 50%, #E4E9FD 50%);
+  min-height: 717px;
+}
+
+.todo-img{
+  width: 256px;
+  height: 256px;
+}
+</style>
+
+<div class="jumbotron centered">
+  <div class="container fluid">
+    <img class="todo-img" src="images/to-do.png"><br><br>
+    <h1 class="display-3"><b>To-Do List App</b></h1>
+    <p class="lead">Don't keep your secrets, share them anonymously!</p><br>
+    <hr><br>
+    <a class="btn btn-light btn-lg" href="/register" role="button">Register</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a class="btn btn-dark btn-lg" href="/login" role="button">Login</a>
+
+  </div>
+</div>
+
+<%- include('footer') %>
