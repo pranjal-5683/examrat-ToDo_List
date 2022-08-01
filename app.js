@@ -2,7 +2,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const md5 = require("md5");
+const session = require("express-session");
+const passport = require("passport");
+const passportLocalMongoose = require("passport-local-mongoose");
 
 const app = express();
 
@@ -14,12 +16,24 @@ let options = {
 };
 let day = today.toLocaleDateString("en-US", options)
 
+
 app.set("view engine", "ejs");
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb+srv://admin-Pranjal:admin123@todolist-cluster.ikcrfai.mongodb.net/todolistDB");   //DB Connection
+app.use(session({
+	secret: "Our little secret.",
+	resave: false,
+	saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+		//MongoDB Connection
+mongoose.connect("mongodb+srv://admin-Pranjal:admin123@todolist-cluster.ikcrfai.mongodb.net/todolistDB");
 
 
 		// Schema Definition
@@ -36,8 +50,14 @@ const usersSchema = new mongoose.Schema({
 	items: [itemsSchema]
 });
 
+usersSchema.plugin(passportLocalMongoose);
+
 const User = mongoose.model("User", usersSchema);
 
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 		// Default Items
 const item1 = new Item({
@@ -54,7 +74,7 @@ const defaultItems = [item1, item2, item3];
 
 let Name;
 
-			
+
 		// GET & POST requests
 app.get("/", function(req, res){
 	res.render("home");
@@ -69,15 +89,17 @@ app.route("/login")
 })
 
 .post(function(req, res){
-	const username = req.body.username;
-	const password = md5(req.body.password);
-
-	User.findOne({email: username}, function(err, foundUser){
-		if(!err && foundUser && (foundUser.password === password) ){
-			Name = foundUser.name;
-			res.redirect("/list")
-		} else {
+	const user = new User({
+		username: req.body.username,
+		password: req.body.password
+	});
+	req.login(user, function(err){
+		if(err){
 			console.log(err);
+		} else{
+			passport.authenticate("local")(req, res, function(){
+				res.redirect("/list");
+			});
 		}
 	})
 });
@@ -91,17 +113,14 @@ app.route("/register")
 })
 
 .post(function(req, res){
-	const newUser = new User({
-		name: req.body.name,
-		email: req.body.username,
-		password: md5(req.body.password)
-	})
-
-	newUser.save(function(err){
-		if(!err){
-			res.redirect("/");
+	User.register({name: req.body.name, username: req.body.username}, req.body.password, function(err, user){
+		if(err){
+			console.log(err);
+			res.redirect("/register");
 		} else {
-			console.log(err)
+			passport.authenticate("local")(req, res, function(){
+				res.redirect("/list");
+			})
 		}
 	})
 });
@@ -120,7 +139,7 @@ app.route("/list")
 				else
 					console.log("Items added to the document")
 			})
-			res.redirect("/list");	
+			res.redirect("/list");
 		} else
 			res.render("list", {userName: Name,listTitle: day, newListItems: foundItems});
 		})
@@ -129,7 +148,7 @@ app.route("/list")
 .post(function(req, res){
 
 	const itemName = req.body.newItem;
-	
+
 	const item = new Item({
 		name: itemName
 	})
@@ -151,16 +170,21 @@ app.post("/delete", function(req, res){
 			console.log("Successfully deleted")
 			res.redirect("/list");
 		}
-	});	
+	});
 
 });
 
 
 		// Logging out user
 app.get("/logout", function(req, res){
-	Name = "";
-	res.redirect("/");
-});
+		req.logout(function(err){
+			if(err){
+				console.log(err)
+			} else {
+				res.redirect("/");
+			}
+		});
+})
 
 
 		// Port Connection
